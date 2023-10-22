@@ -1,7 +1,7 @@
 /* eslint no-underscore-dangle: 0 */
 class Listener {
-  constructor(playlistService, mailSender) {
-    this._playlistService = playlistService;
+  constructor(mailSender) {
+    // this._playlistService = playlistService;
     this._mailSender = mailSender;
 
     this.listen = this.listen.bind(this);
@@ -9,27 +9,11 @@ class Listener {
 
   async listen(message) {
     try {
-      const { playlistId, targetEmail } = JSON.parse(message.content.toString());
-
-      const playlist = await this._playlistService.getPlaylists(playlistId);
-
-      const songs = await this._playlistService.getSongs(playlistId);
-
-      const exportedPlaylist = {
-        playlist: {
-          id: playlist.id,
-          name: playlist.name,
-          songs: songs.map((song) => ({
-            id: song.id,
-            title: song.title,
-            performer: song.performer,
-          })),
-        },
-      };
+      const { playlistTarget, targetEmail } = JSON.parse(message.content.toString());
 
       const result = await this._mailSender.sendEmail(
         targetEmail,
-        JSON.stringify(exportedPlaylist),
+        JSON.stringify(playlistTarget),
       );
       console.log(result);
     } catch (error) {
